@@ -16,8 +16,10 @@ import { useRouter } from "next/navigation";
 import WrapContent from "@/components/Layouts/WrapContent";
 import { DataGrid } from "@mui/x-data-grid";
 import useLogout from "@/hooks/logout";
-import EditStudent from "@/components/Students/EditStudent";
-import AddStudent from "@/components/Students/AddStudent";
+import ViewCourse from "@/components/Course/ViewCourse";
+import EditCourse from "@/components/Course/EditCourse";
+import EditVideoURLs from "@/components/Course/EditVideo";
+import AddCourse from "@/components/Course/AddCourse";
 
 export default function HomePage() {
   const [tabledata, setTableData] = useState([]);
@@ -30,6 +32,9 @@ export default function HomePage() {
   const [userProfile, setUserProfile] = useState(null)
   const [editOpen, setEditOpen] = useState(false)
   const [open, setOpen] = useState(false)
+  const [viewOpen, setViewOpen] = useState(false)
+  const [videos, setVideos] = useState([])
+  const [videoOpen, setVideoOpen] = useState(false)
 
   const router = useRouter();
   const { logout } = useLogout()
@@ -43,7 +48,7 @@ export default function HomePage() {
     {
       flex: 0.1,
       headerClassName: 'super-app-theme--header',
-      minWidth: 100,
+      minWidth: 80,
       field: 'id',
       headerName: 'ID',
       renderCell: ({ row }) => <div>{row.id}</div>
@@ -129,30 +134,7 @@ export default function HomePage() {
         </Box>
       )
     },
-    {
-      flex: 0.1,
-      headerClassName: 'super-app-theme--header',
-      minWidth: 100,
-      headerName: 'Video',
-      field: 'Video',
-      renderCell: ({ row }) => (
-        <Box>
-          {row.video}
-        </Box>
-      )
-    },
-    {
-      flex: 0.1,
-      headerClassName: 'super-app-theme--header',
-      minWidth: 100,
-      headerName: 'Video_url',
-      field: 'Video_url',
-      renderCell: ({ row }) => (
-          <Box>
-             {row.video}
-          </Box>
-      )
-  },
+    
     {
       flex: 0.1,
       headerClassName: 'super-app-theme--header',
@@ -168,11 +150,20 @@ export default function HomePage() {
     {
       flex: 0.15,
       headerClassName: 'super-app-theme--header',
-      minWidth: 100,
+      minWidth: 250,
       field: 'actions',
       headerName: 'ACTION',
       renderCell: ({ row }) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap:1 }}>
+          <Button
+            variant='contained'
+            sx={{ fontSize: '10px' }}
+            size='small'
+            color='success'
+            onClick={() => hanldeView(row)}
+          >
+            View
+          </Button>
           <Button
             variant='contained'
             sx={{ fontSize: '10px' }}
@@ -181,6 +172,15 @@ export default function HomePage() {
             onClick={() => hanldeEdit(row)}
           >
             Edit
+          </Button>
+          <Button
+            variant='contained'
+            sx={{ fontSize: '10px' }}
+            size='small'
+            color='info'
+            onClick={() => hanldeVideo(row)}
+          >
+            Edit Videos
           </Button>
         </Box>
       )
@@ -249,6 +249,17 @@ export default function HomePage() {
     setEditOpen(true)
   }
 
+  const hanldeView = (row) => {
+    setUserProfile(row)
+    setViewOpen(true)
+  }
+
+  const hanldeVideo = (row) => {
+    setVideos(row.video_urls)
+    setUserProfile(row)
+    setVideoOpen(true)
+  }
+
   const handleAdd = () => {
     setOpen(true)
   }
@@ -266,7 +277,7 @@ export default function HomePage() {
             }}
           >
             <Typography variant="h5" sx={{}}>
-              All Students
+              All Courses
             </Typography>
             <Button variant="contained" onClick={handleAdd}>ADD Student</Button>
           </Box>
@@ -276,7 +287,7 @@ export default function HomePage() {
               <Box
                 sx={{
                   height: "70vh",
-                  width: "100%",
+                 width:'100%',
                   "& .super-app-theme--header": {
                     backgroundColor: "#1976d2",
                     color: "white",
@@ -318,8 +329,10 @@ export default function HomePage() {
         </Box>
       </WrapContent>
 
-      <EditStudent setEditOpen={setEditOpen} editOpen={editOpen} userProfile={userProfile} fetchStudents={fetchStudents} />
-      <AddStudent setEditOpen={setOpen} editOpen={open} userProfile={userProfile} fetchStudents={fetchStudents} />
+      <ViewCourse  setEditOpen={setViewOpen} editOpen={viewOpen} course={userProfile}/>
+      <EditCourse setEditOpen={setEditOpen} editOpen={editOpen} courseDetails={userProfile} fetchCourses={fetchStudents} />
+      <EditVideoURLs setVideoOpen={setVideoOpen} videoOpen={videoOpen} videoUrls={videos} fetchCourses={fetchStudents} courseDetails={userProfile}/>
+      <AddCourse setEditOpen={setOpen} editOpen={open} userProfile={userProfile} fetchCourses={fetchStudents} />
     </Box>
   );
 }
